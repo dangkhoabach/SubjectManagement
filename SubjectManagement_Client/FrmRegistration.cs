@@ -25,6 +25,11 @@ namespace SubjectManagement_Client
 
         private void FrmRegistration_Load(object sender, EventArgs e)
         {
+            LoadDataFromServer();
+        }
+
+        private void LoadDataFromServer()
+        {
             try
             {
                 client = new TcpClient(IpServer.ipAddress, IpServer.port);
@@ -66,7 +71,7 @@ namespace SubjectManagement_Client
             }
         }
 
-        private void btnRegistration_Click(object sender, EventArgs e)
+            private void btnRegistration_Click(object sender, EventArgs e)
         {
             if (dgvCourses.SelectedRows.Count > 0)
             {
@@ -115,6 +120,30 @@ namespace SubjectManagement_Client
             {
                 client.Close();
             }
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            LoadDataFromServer();
+            FilterCourses();
+        }
+
+        private void FilterCourses()
+        {
+            string searchKeyword = txtSearch.Text.Trim();
+            DataView dv = new DataView((DataTable)dgvCourses.DataSource);
+
+            if (!string.IsNullOrEmpty(searchKeyword))
+            {
+                dv.RowFilter = $"[Mã học phần] LIKE '%{searchKeyword}%' OR [Tên học phần] LIKE '%{searchKeyword}%'";
+            }
+            else
+            {
+                // Nếu không có từ khóa tìm kiếm, hiển thị tất cả dữ liệu
+                dv.RowFilter = string.Empty;
+            }
+
+            dgvCourses.DataSource = dv.ToTable();
         }
     }
 }
