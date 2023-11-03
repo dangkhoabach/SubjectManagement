@@ -27,7 +27,7 @@ namespace SubjectManagement_Client
         {
             try
             {
-                client = new TcpClient(IpServer.ipAddress, 12345);
+                client = new TcpClient(IpServer.ipAddress, IpServer.port);
                 NetworkStream clientStream = client.GetStream();
 
                 string query = $"QUERY|{UserSession.StudentID}|SELECT * FROM Courses";
@@ -84,7 +84,7 @@ namespace SubjectManagement_Client
         {
             try
             {
-                client = new TcpClient("172.20.10.2", 12345);
+                client = new TcpClient(IpServer.ipAddress, IpServer.port);
                 NetworkStream clientStream = client.GetStream();
 
                 byte[] data = Encoding.UTF8.GetBytes(request);

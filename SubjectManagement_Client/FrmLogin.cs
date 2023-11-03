@@ -24,7 +24,7 @@ namespace SubjectManagement_Client
         {
             try
             {
-                client = new TcpClient(IpServer.ipAddress, 12345);
+                client = new TcpClient(IpServer.ipAddress, IpServer.port);
 
                 NetworkStream clientStream = client.GetStream();
                 byte[] message = Encoding.ASCII.GetBytes($"LOGIN|{txtStudentID.Text}|{txtPassword.Text}");
