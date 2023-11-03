@@ -48,13 +48,13 @@ namespace SubjectManagement_Client
 
                 dataTable.Columns["SubjectID"].ColumnName = "Mã học phần";
                 dataTable.Columns["SubjectName"].ColumnName = "Tên học phần";
-                dataTable.Columns["MajorsID"].ColumnName = "Chuyên nghành";
+                dataTable.Columns["MajorsName"].ColumnName = "Chuyên nghành";
                 dataTable.Columns["Credits"].ColumnName = "Số tín chỉ";
                 dataTable.Columns["Lessons"].ColumnName = "Số tiết";
                 dataTable.Columns["Day"].ColumnName = "Ngày học";
                 dataTable.Columns["StartSlot"].ColumnName = "Tiết bắt đầu";
-                dataTable.Columns["RoomID"].ColumnName = "Phòng học";
-                dataTable.Columns["InstructorID"].ColumnName = "Giảng viên";
+                dataTable.Columns["RoomName"].ColumnName = "Phòng học";
+                dataTable.Columns["InstructorName"].ColumnName = "Giảng viên";
                 dataTable.Columns["PeriodStart"].ColumnName = "Thời gian bắt đầu";
                 /*dataTable.Columns["PeriodEnd"].ColumnName = "Thời gian kết thúc";
                 dataTable.Columns["PriorityLevel"].ColumnName = "Mức độ ưu tiên";*/
@@ -139,7 +139,7 @@ namespace SubjectManagement_Client
             }
             else
             {
-                // Nếu không có từ khóa tìm kiếm, hiển thị tất cả dữ liệu
+                //Nếu không có từ khóa tìm kiếm, hiển thị tất cả dữ liệu
                 dv.RowFilter = string.Empty;
             }
 

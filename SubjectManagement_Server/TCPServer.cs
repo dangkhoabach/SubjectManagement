@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using Newtonsoft.Json;
+using static TheArtOfDevHtmlRenderer.Adapters.RGraphicsPath;
 
 namespace SubjectManagement_Server
 {
@@ -169,36 +170,43 @@ namespace SubjectManagement_Server
         }
 
         private string ProcessQueryRequest(string studentID, string query)
-{
-    try
-    {
-        using (SqlConnection connection = new SqlConnection(connectionString))
         {
-            connection.Open();
-
-            string modifiedQuery = $"SELECT SubjectID, SubjectName, MajorsID, Credits, Lessons, Day, StartSlot, RoomID, InstructorID, PeriodStart FROM Courses WHERE MajorsID = (SELECT MajorsID FROM Student WHERE StudentID = @studentid) ORDER BY PriorityLevel ASC";
-
-            using (SqlCommand command = new SqlCommand(modifiedQuery, connection))
+            try
             {
-                command.Parameters.AddWithValue("@studentid", studentID);
-
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    DataTable dataTable = new DataTable();
-                    dataTable.Load(reader);
+                    connection.Open();
 
-                    //Chuyển DataTable thành chuỗi JSON để gửi về client
-                    string jsonResult = JsonConvert.SerializeObject(dataTable);
-                    return jsonResult;
+                    string modifiedQuery = @"SELECT c.SubjectID, c.SubjectName, m.MajorsName, c.Credits, c.Lessons, c.Day, c.StartSlot, r.RoomName, i.InstructorName, c.PeriodStart
+                                    FROM Courses c
+                                    INNER JOIN Room r ON c.RoomID = r.RoomID
+                                    INNER JOIN Instructors i ON c.InstructorID = i.InstructorID
+                                    INNER JOIN Majors m ON c.MajorsID = m.MajorsID
+                                    WHERE c.MajorsID = (SELECT MajorsID FROM Student WHERE StudentID = @studentid)
+                                    ORDER BY c.PriorityLevel ASC";
+
+                    using (SqlCommand command = new SqlCommand(modifiedQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@studentid", studentID);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            DataTable dataTable = new DataTable();
+                            dataTable.Load(reader);
+
+                            // Chuyển DataTable thành chuỗi JSON để gửi về client
+                            string jsonResult = JsonConvert.SerializeObject(dataTable);
+                            return jsonResult;
+                        }
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                return "ERROR: " + ex.Message;
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        return "ERROR: " + ex.Message;
-    }
-}
+
 
         private string ProcessRegistrationRequest(string studentID, string subjectID)
         {
@@ -279,7 +287,12 @@ namespace SubjectManagement_Server
                     subjectIDs.Add(row["SubjectID"].ToString());
                 }
 
-                string query = "SELECT SubjectID, SubjectName, MajorsID, Credits, Lessons, Day, StartSlot, RoomID, InstructorID, PeriodStart FROM Courses WHERE SubjectID IN ('" + string.Join("','", subjectIDs) + "') ORDER BY PriorityLevel ASC";
+                string query = @"SELECT c.SubjectID, c.SubjectName, m.MajorsName, c.Credits, c.Lessons, c.Day, c.StartSlot, r.RoomName, i.InstructorName, c.PeriodStart 
+                         FROM Courses c
+                         INNER JOIN Majors m ON c.MajorsID = m.MajorsID
+                         INNER JOIN Instructors i ON c.InstructorID = i.InstructorID
+                         INNER JOIN Room r ON c.RoomID = r.RoomID
+                         WHERE c.SubjectID IN ('" + string.Join("','", subjectIDs) + "') ORDER BY c.PriorityLevel ASC";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     connection.Open();
